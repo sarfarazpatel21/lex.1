@@ -1,0 +1,42 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LENGTH 100
+
+int is_palindrome(const char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len / 2; i++) {
+        if (str[i] != str[len - 1 - i]) {
+            return 0; // Not a palindrome
+        }
+    }
+    return 1; // Is a palindrome
+}
+%}
+
+%%
+
+// Match a sequence of digits
+[0-9]+ {
+    // Check if the matched number is a palindrome
+    if (is_palindrome(yytext)) {
+        printf("%s is a palindrome number.\n", yytext);
+    } else {
+        printf("%s is not a palindrome number.\n", yytext);
+    }
+}
+
+[ \t\n]+  // Ignore whitespace
+
+.  { /* Ignore any other characters */ }
+
+%%
+
+// Main function
+int main(int argc, char **argv) {
+    printf("Enter numbers (press Ctrl+D to end input):\n");
+    yylex(); // Start the lexical analysis
+    return 0;
+}
