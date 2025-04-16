@@ -1,0 +1,71 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 100
+
+char stack[MAX][MAX]; // Stack to hold expressions
+int top = -1; // Stack pointer
+
+void push(char *str) {
+    if (top < MAX - 1) {
+        top++;
+        strcpy(stack[top], str);
+    }
+}
+
+char* pop() {
+    if (top >= 0) {
+        return stack[top--];
+    }
+    return NULL;
+}
+
+void convert_prefix_to_postfix(char *prefix) {
+    char *token = strtok(prefix, " ");
+    while (token != NULL) {
+        if (isalnum(token[0])) { // If the token is an operand
+            push(token);
+        } else { // If the token is an operator
+            char *operand1 = pop();
+            char *operand2 = pop();
+            char result[MAX];
+            snprintf(result, sizeof(result), "%s %s %s", operand1, operand2, token);
+            push(result);
+        }
+        token = strtok(NULL, " ");
+    }
+    printf("Postfix: %s\n", pop());
+}
+%}
+
+%%
+
+// Match prefix expressions (operators and operands)
+[+\-*\/] {
+    // Do nothing here; handled in the conversion function
+}
+
+[0-9a-zA-Z]+ {
+    // Do nothing here; handled in the conversion function
+}
+
+[ \t\n]+  // Ignore whitespace
+
+.  { /* Ignore any other characters */ }
+
+%%
+
+// Main function
+int main(int argc, char **argv) {
+    char input[256];
+    printf("Enter a prefix expression: ");
+    fgets(input, sizeof(input), stdin);
+    
+    // Remove newline character from input
+    input[strcspn(input, "\n")] = 0;
+
+    convert_prefix_to_postfix(input); // Convert the prefix expression to postfix
+    return 0;
+}
