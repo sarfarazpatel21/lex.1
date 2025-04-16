@@ -1,0 +1,36 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int decimalValue = 0;
+%}
+
+%%
+
+// Match binary digits (0 and 1)
+[01]+ {
+    // Convert the matched binary string to decimal
+    decimalValue = 0; // Reset decimal value for each new binary number
+    char *binaryString = strdup(yytext); // Duplicate the matched string
+    int length = strlen(binaryString);
+    
+    for (int i = 0; i < length; i++) {
+        decimalValue = decimalValue * 2 + (binaryString[i] - '0');
+    }
+    
+    printf("Binary: %s -> Decimal: %d\n", binaryString, decimalValue);
+    free(binaryString); // Free the duplicated string
+}
+
+[ \t\n]+  // Ignore whitespace
+
+.  { /* Ignore any other characters */ }
+
+%%
+
+// Main function
+int main(int argc, char **argv) {
+    yylex(); // Start the lexical analysis
+    return 0;
+}
